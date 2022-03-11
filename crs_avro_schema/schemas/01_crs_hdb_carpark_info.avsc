@@ -1,0 +1,22 @@
+{
+   "type": "record",
+   "namespace": "com.example",
+   "name": "HDBCarparkInfo",
+   "aliases": ["HDB_CPK_INFO"],
+   "doc": "Schema for All Singapore Public Carpark Info",
+   "fields": [
+      { "name": "short_term_parking", "type": "string"},
+      { "name": "car_park_type", "type": "string" },
+      { "name": "y_coord", "type": "string" },
+      { "name": "x_coord", "type": "string"},
+      { "name": "free_parking", "type": "string"},
+      { "name": "gantry_height", "type": "string"},
+      { "name": "car_park_basement", "type": "string"},
+      { "name": "night_parking", "type": "string"},
+      { "name": "address", "type": "string"},
+      { "name": "car_park_decks", "type": "string"},
+      { "name": "_id", "type": "int"},
+      { "name": "car_park_no", "type": "string"},
+      { "name": "type_of_parking_system", "type": "string"}
+   ]
+}
