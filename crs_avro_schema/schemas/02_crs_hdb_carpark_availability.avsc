@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "namespace": "com.crs",
+  "name": "HDBCarparkAvailability",
+  "aliases": ["HDB_CPK_AVAILABILITY", "API.HDB.CPKAVAILABILITY"],
+  "doc": "Schema for All Singapore Public Carpark Availability",
+  "fields": [
+    { "name": "api_timestamp", "type": "string"},
+    { "name": "total_lots", "type": "string" },
+    { "name": "lot_type", "type": "string" },
+    { "name": "lots_available", "type": "string"},
+    { "name": "carpark_number", "type": "string"},
+    { "name": "update_datetime", "type": "string"}
+  ]
+}

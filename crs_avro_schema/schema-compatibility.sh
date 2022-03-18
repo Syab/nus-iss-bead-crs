@@ -11,6 +11,9 @@ done
 echo -e "\nSet compatibility for HDB CPK INFO"
 curl -X PUT -H "Content-Type: application/json" \
   --data '{"compatibility": "FULL"}' \
-  ${schema_registry}/config/HDB_CPK_INFO-value
+  ${schema_registry}/config/API.HDB.CPKINFO-value
 
-
+echo -e "\nSet compatibility for HDB_CPK_AVAILABILITY"
+curl -X PUT -H "Content-Type: application/json" \
+  --data '{"compatibility": "FULL"}' \
+  ${schema_registry}/config/API.HDB.CPKAVAILABILITY-value

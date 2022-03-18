@@ -12,7 +12,7 @@ deploy_schemas() {
   for file in ${fileList}; do
     fileContent=$(cat $file)
 
-    s=$(echo $fileContent | jq '.aliases[0]')
+    s=$(echo $fileContent | jq '.aliases[1]')
     echo ${s}
     s1=${s%\"}
     echo ${s1}

@@ -1,5 +1,7 @@
-import HDBInfo from "./getHDBCarparkInfo"
+const { getHDBCarparkInfo } = require("./getHDBCarparkInfo");
+const { getHDBCarparkAvailability } = require('./getHDBCarparkAvailability')
 
-export {
-    HDBInfo
+module.exports = {
+    getHDBCarparkInfo,
+    getHDBCarparkAvailability
 }

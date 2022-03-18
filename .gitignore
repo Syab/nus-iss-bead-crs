@@ -104,3 +104,6 @@ dist
 .tern-port
 
 .idea/*
+
+crs_kafka_local/keys/*
+crs_kafka_local/plugins/*

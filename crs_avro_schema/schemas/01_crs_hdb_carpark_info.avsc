@@ -1,8 +1,8 @@
 {
    "type": "record",
-   "namespace": "com.example",
+   "namespace": "com.crs",
    "name": "HDBCarparkInfo",
-   "aliases": ["HDB_CPK_INFO"],
+   "aliases": ["HDB_CPK_INFO", "API.HDB.CPKINFO"],
    "doc": "Schema for All Singapore Public Carpark Info",
    "fields": [
       { "name": "short_term_parking", "type": "string"},
