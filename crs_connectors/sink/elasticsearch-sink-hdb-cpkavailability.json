@@ -1,0 +1,12 @@
+{
+  "name":"elasticsearch-sink-hdb-cpkavailability",
+  "config": {
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "tasks.max": "1",
+    "topics": "HDB_CPKAVAILABILITY",
+    "connection.url": "http://elasticsearch:9200",
+    "type.name": "_doc",
+    "key.ignore": "true",
+    "batch.size": 200
+  }
+}

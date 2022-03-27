@@ -2,7 +2,7 @@
    "type": "record",
    "namespace": "com.crs",
    "name": "HDBCarparkInfo",
-   "aliases": ["HDB_CPK_INFO", "API.HDB.CPKINFO"],
+   "aliases": ["HDB_CPKINFO"],
    "doc": "Schema for All Singapore Public Carpark Info",
    "fields": [
       { "name": "short_term_parking", "type": "string"},
@@ -15,7 +15,7 @@
       { "name": "night_parking", "type": "string"},
       { "name": "address", "type": "string"},
       { "name": "car_park_decks", "type": "string"},
-      { "name": "_id", "type": "int"},
+      { "name": "cpkid", "type": "int"},
       { "name": "car_park_no", "type": "string"},
       { "name": "type_of_parking_system", "type": "string"}
    ]

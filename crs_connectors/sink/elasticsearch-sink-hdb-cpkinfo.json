@@ -1,0 +1,12 @@
+{
+  "name":"elasticsearch-sink-hdb-cpkinfo",
+  "config": {
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "tasks.max": "1",
+    "topics": "HDB_CPKINFO",
+    "connection.url": "http://elasticsearch:9200",
+    "type.name": "_doc",
+    "key.ignore": "true",
+    "batch.size": 200
+  }
+}

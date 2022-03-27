@@ -2,7 +2,7 @@
   "type": "record",
   "namespace": "com.crs",
   "name": "HDBCarparkAvailability",
-  "aliases": ["HDB_CPK_AVAILABILITY", "API.HDB.CPKAVAILABILITY"],
+  "aliases": ["HDB_CPKAVAILABILITY"],
   "doc": "Schema for All Singapore Public Carpark Availability",
   "fields": [
     { "name": "api_timestamp", "type": "string"},

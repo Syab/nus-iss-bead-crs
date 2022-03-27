@@ -32,7 +32,7 @@ const getHDBCarparkInfo = () => {
                         night_parking: item.night_parking.trim(),
                         address: item.address.trim(),
                         car_park_decks: item.car_park_decks.trim(),
-                        _id: item._id,
+                        cpkid: item._id,
                         car_park_no: item.car_park_no.trim(),
                         type_of_parking_system: item.type_of_parking_system.trim()
                     })

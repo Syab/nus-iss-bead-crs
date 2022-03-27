@@ -1,0 +1,10 @@
+{
+  "name": "bigquery-sink-sample",
+  "config": {
+    "connector.class": "com.wepay.kafka.connect.bigquery.BigQuerySinkConnector",
+    "tasks.max": "1",
+    "topics" : "kcbq-quickstart1",
+    "sanitizeTopics" : "true",
+    "autoCreateTables" : "true"
+  }
+}

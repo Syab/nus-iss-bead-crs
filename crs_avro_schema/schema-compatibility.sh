@@ -8,12 +8,12 @@ while [ $response -ne 200 ]; do
   sleep 1
 done
 
-echo -e "\nSet compatibility for HDB CPK INFO"
+echo -e "\nSet compatibility for HDB_CPKINFO"
 curl -X PUT -H "Content-Type: application/json" \
   --data '{"compatibility": "FULL"}' \
-  ${schema_registry}/config/API.HDB.CPKINFO-value
+  ${schema_registry}/config/HDB_CPKINFO-value
 
 echo -e "\nSet compatibility for HDB_CPK_AVAILABILITY"
 curl -X PUT -H "Content-Type: application/json" \
   --data '{"compatibility": "FULL"}' \
-  ${schema_registry}/config/API.HDB.CPKAVAILABILITY-value
+  ${schema_registry}/config/HDB_CPKAVAILABILITY-value
