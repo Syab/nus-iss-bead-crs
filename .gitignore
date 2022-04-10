@@ -105,5 +105,10 @@ dist
 
 .idea/*
 
-crs_kafka_local/keys/*
-crs_kafka_local/plugins/*
+*/keys/*
+*/plugins/*
+
+crs-kafka-cc/config/*
+crs-kafka-cc/ksql-auth/
+
+*.env*

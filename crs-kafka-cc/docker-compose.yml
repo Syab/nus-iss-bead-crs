@@ -1,0 +1,142 @@
+---
+version: '2'
+services:
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.1.0
+    hostname: schema-registry
+    container_name: schema-registry
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+
+  connect:
+    image: confluentinc/cp-kafka-connect:7.1.0
+    hostname: connect
+    container_name: connect
+    depends_on:
+    #  - broker
+      - schema-registry
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
+      # ssl config
+      CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+      CONNECT_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_SASL_MECHANISM: PLAIN
+      CONNECT_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      CONNECT_REQUEST_TIMEOUT_MS: 20000
+      CONNECT_RETRY_BACKOFF_MS: 500
+      # Producers
+      CONNECT_PRODUCER_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+      CONNECT_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_PRODUCER_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      CONNECT_PRODUCER_SASL_MECHANISM: PLAIN
+      CONNECT_PRODUCER_REQUEST_TIMEOUT_MS: 20000
+      CONNECT_PRODUCER_RETRY_BACKOFF_MS: 500
+      # Consumer
+      CONNECT_CONSUMER_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_CONSUMER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+      CONNECT_CONSUMER_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_CONSUMER_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      CONNECT_CONSUMER_SASL_MECHANISM: PLAIN
+      CONNECT_CONSUMER_REQUEST_TIMEOUT_MS: 20000
+      CONNECT_CONSUMER_RETRY_BACKOFF_MS: 500
+      # schema registry config
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      # reporters
+      CONNECT_REPORTER_ADMIN_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_REPORTER_ADMIN_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      CONNECT_REPORTER_ADMIN_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_REPORTER_ADMIN_SASL_MECHANISM: PLAIN
+      # reporter producers
+      CONNECT_REPORTER_PRODUCER_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      CONNECT_REPORTER_PRODUCER_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      CONNECT_REPORTER_PRODUCER_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_REPORTER_PRODUCER_SASL_MECHANISM: PLAIN
+      # CLASSPATH required due to CC-2422
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.0.1.jar
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+    volumes:
+      - "./plugins:/usr/share/confluent-hub-components/"
+      - "./keys:/secrets/"
+      - "./config:/config/"
+
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:7.1.0
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    depends_on:
+      - connect
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 3
+      KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 3
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 3
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_SECURITY_PROTOCOL: SASL_SSL
+      KSQL_SASL_MECHANISM : PLAIN
+      KSQL_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      # schema registry
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      KSQL_KSQL_CONNECT_URL: "http://connect:8083"
+
+  ksqldb-cli:
+    image: confluentinc/cp-ksqldb-cli:7.1.0
+    container_name: ksqldb-cli
+    depends_on:
+      - connect
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:7.1.0
+    ports:
+      - 8082:8082
+    hostname: rest-proxy
+    container_name: rest-proxy
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      KAFKA_REST_SECURITY_PROTOCOL: SASL_SSL
+      KAFKA_REST_SASL_MECHANISM: PLAIN
+      KAFKA_REST_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      KAFKA_REST_CLIENT_BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      KAFKA_REST_CLIENT_SECURITY_PROTOCOL: SASL_SSL
+      KAFKA_REST_CLIENT_SASL_JAAS_CONFIG: ${SASL_JAAS_CONFIG}
+      KAFKA_REST_CLIENT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: https
+      KAFKA_REST_CLIENT_SASL_MECHANISM: PLAIN
