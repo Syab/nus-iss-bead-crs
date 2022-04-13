@@ -115,9 +115,9 @@ services:
   ksqldb-cli:
     image: confluentinc/cp-ksqldb-cli:7.1.0
     container_name: ksqldb-cli
-    depends_on:
-      - connect
-      - ksqldb-server
+#    depends_on:
+#      - connect
+#      - ksqldb-server
     entrypoint: /bin/sh
     tty: true
 

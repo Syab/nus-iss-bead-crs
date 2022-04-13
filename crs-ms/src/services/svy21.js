@@ -160,8 +160,8 @@ function SVY21() {
         return {lat: lat / (Math.PI / 180), lon: lon / (Math.PI / 180)};
     };
 
-};
-
-export {
-    SVY21
 }
+
+module.exports = (
+    SVY21
+)

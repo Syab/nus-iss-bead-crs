@@ -1,10 +1,13 @@
 const axios = require('axios');
 const kafkaService = require('../services/kafkaService')
+const SVY21 = require('../services/svy21')
 const {
     HDB_INFO_TOPIC_NAME,
     HDB_INFO_SCHEMA_ID,
     HDB_API
 } = require("../services/config");
+
+const cv = new SVY21()
 
 const formatToSchema = (schemaId, data) => ({
     value_schema_id : schemaId,
@@ -24,8 +27,11 @@ const getHDBCarparkInfo = () => {
                     (item) => ({
                         short_term_parking: item.short_term_parking.trim(),
                         car_park_type: item.car_park_type.trim(),
-                        y_coord: item.y_coord.trim(),
-                        x_coord: item.x_coord.trim(),
+                        y_coord:item.y_coord.trim(),
+                        x_coord:item.x_coord.trim(),
+                        latitude: cv.computeLatLon(item.y_coord.trim(),item.x_coord.trim())['lat'].toString(),
+                        longitude: cv.computeLatLon(item.y_coord.trim(),item.x_coord.trim())['lon'].toString(),
+                        latlong: JSON.stringify(cv.computeLatLon(item.y_coord.trim(),item.x_coord.trim())['lat'])+','+JSON.stringify(cv.computeLatLon(item.y_coord.trim(),item.x_coord.trim())['lon']),
                         free_parking: item.free_parking.trim(),
                         gantry_height: item.gantry_height.trim(),
                         car_park_basement: item.car_park_basement.trim(),
@@ -35,9 +41,12 @@ const getHDBCarparkInfo = () => {
                         cpkid: item._id,
                         car_park_no: item.car_park_no.trim(),
                         type_of_parking_system: item.type_of_parking_system.trim()
-                    })
+                    }
+                    )
                 )
+
                 const formatToRestProxy = formatToSchema(HDB_INFO_SCHEMA_ID, formattedData)
+                console.log(formatToRestProxy['records'][0]['value'])
                 console.log(formatToRestProxy)
                 kafkaService
                     .pushToTopic(HDB_INFO_TOPIC_NAME, formatToRestProxy)

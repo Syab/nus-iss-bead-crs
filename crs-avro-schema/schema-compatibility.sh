@@ -13,7 +13,7 @@ curl -X PUT -H "Content-Type: application/json" \
   --data '{"compatibility": "FULL"}' \
   ${schema_registry}/config/HDB_CPKINFO-value
 
-echo -e "\nSet compatibility for HDB_CPK_AVAILABILITY"
+echo -e "\nSet compatibility for HDB_CPKAVAILABILITY"
 curl -X PUT -H "Content-Type: application/json" \
   --data '{"compatibility": "FULL"}' \
   ${schema_registry}/config/HDB_CPKAVAILABILITY-value

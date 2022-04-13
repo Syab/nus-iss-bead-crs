@@ -2,7 +2,7 @@
 version: '2'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.1
+    image: confluentinc/cp-zookeeper:latest.arm64
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -12,7 +12,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-server:7.0.1
+    image: confluentinc/cp-server:latest.arm64
     hostname: broker
     container_name: broker
     depends_on:
@@ -41,7 +41,7 @@ services:
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:7.0.1
+    image: confluentinc/cp-schema-registry:7.1.0
     hostname: schema-registry
     container_name: schema-registry
     depends_on:
@@ -54,7 +54,7 @@ services:
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
   connect:
-    image: cnfldemos/cp-server-connect-datagen:0.5.0-6.2.0
+    image: confluentinc/cp-kafka-connect:7.1.0
     hostname: connect
     container_name: connect
     depends_on:
@@ -87,7 +87,7 @@ services:
       - "./keys:/home/appuser/secrets/"
 
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:7.0.1
+    image: confluentinc/cp-ksqldb-server:7.1.0
     hostname: ksqldb-server
     container_name: ksqldb-server
     depends_on:
@@ -110,7 +110,7 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
 
   ksqldb-cli:
-    image: confluentinc/cp-ksqldb-cli:7.0.1
+    image: confluentinc/cp-ksqldb-cli:7.1.0
     container_name: ksqldb-cli
     depends_on:
       - broker
@@ -120,7 +120,7 @@ services:
     tty: true
 
   rest-proxy:
-    image: confluentinc/cp-kafka-rest:7.0.1
+    image: confluentinc/cp-kafka-rest:7.1.0
     depends_on:
       - broker
       - schema-registry
@@ -133,28 +133,3 @@ services:
       KAFKA_REST_BOOTSTRAP_SERVERS: 'broker:29092'
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.4.0
-    hostname: elasticsearch
-    container_name: elasticsearch
-    ports:
-      - 9200:9200
-    environment:
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS:-Xms1g-Xmx1g"
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.4.0
-    hostname: kibana
-    container_name: kibana
-    environment:
-      SERVER_NAME: kibana
-      ELASTICSEARCH_URL: http://elasticsearch:9200/
-      ES_JAVA_OPTS: "-Xms1g -Xmx2g"
-    ports:
-      - "5601:5601"
-    links:
-      - elasticsearch
-    depends_on:
-      - elasticsearch

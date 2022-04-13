@@ -1,5 +1,6 @@
 const axios = require('axios');
-const kafkaService = require('../services/kafkaService')
+const kafkaService = require('../services/kafkaService');
+const logger = require('../services/logger')
 const {
     HDB_AVAIL_TOPIC_NAME,
     HDB_AVAIL_SCHEMA_ID,
@@ -14,12 +15,12 @@ const formatToSchema = (schemaId, data) => ({
 })
 
 const getHDBCarparkAvailability = () => {
-    console.log('Getting Carpark availability Info')
+    logger.log('Getting Carpark availability Info')
     axios
         .get(HDB_AVAILABILITY_API)
         .then((res)=> {
             if (res && res.data)
-                console.log("Call success")
+                logger.log("Call success")
                 // console.log(res.data.items[0].timestamp)
                 const formattedData = res.data.items[0].carpark_data.map(
                     (item) => ({
@@ -31,19 +32,19 @@ const getHDBCarparkAvailability = () => {
                         update_datetime: item.update_datetime.trim()
                     })
                 )
-                console.log(formattedData)
+                // console.log(formattedData)
                 const formatToRestProxy = formatToSchema(HDB_AVAIL_SCHEMA_ID, formattedData)
                 console.log(formatToRestProxy)
                 kafkaService
                     .pushToTopic(HDB_AVAIL_TOPIC_NAME, formatToRestProxy)
                     .then((res) => {
                         if (res && res.status === 200 && res.data.offsets[0].error === null)
-                            console.log("Succesfully pushed to topic", HDB_AVAIL_TOPIC_NAME)
+                            logger.log(`Successfully pushed to topic ${HDB_AVAIL_TOPIC_NAME}`)
                         else if (res.data.offsets[0].error_code === 400)
                             console.log(res.data.offsets[0].message)
                     })
                     .catch((err) => {
-                        console.log("error pushing to topic 2: ", err)
+                        logger.error("error pushing to topic 2", err)
                     })
         })
         .catch((err) => console.log("some error :" , err))

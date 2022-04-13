@@ -1,0 +1,4 @@
+runtime: nodejs16
+service: default
+includes:
+  - .env

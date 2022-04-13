@@ -8,7 +8,7 @@ module.exports = {
             method: "POST",
             headers: {
                 "Content-Type": "application/vnd.kafka.avro.v2+json",
-                Accept: "application/vnd.kafka.v2+json,application/vnd.kafka+json, application/json"
+                Accept: "application/vnd.kafka.v2+json,application/vnd.kafka+json, application/json",
             },
             data: requestBody
         })

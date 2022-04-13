@@ -4,6 +4,7 @@
   "description": "microservice to get hdb carpark information",
   "main": "index.js",
   "scripts": {
+    "start": "node src/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,9 +20,14 @@
   "homepage": "https://github.com/Syab/nus-iss-bead-crs#readme",
   "dependencies": {
     "axios": "^0.26.0",
+    "body-parser": "^1.20.0",
+    "chalk": "~4.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "pino": "^7.10.0",
+    "pino-pretty": "^7.6.1",
+    "serverless-http": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

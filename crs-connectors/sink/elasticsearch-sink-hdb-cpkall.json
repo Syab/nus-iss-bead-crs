@@ -1,0 +1,12 @@
+{
+  "name":"elasticsearch-sink-hdb-cpkall",
+  "config": {
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "tasks.max": "1",
+    "topics": "HDB_CPKALL",
+    "connection.url": "http://fd3f-121-7-114-228.ngrok.io",
+    "type.name": "kafka-connect",
+    "key.ignore": "true",
+    "batch.size": 200
+  }
+}
