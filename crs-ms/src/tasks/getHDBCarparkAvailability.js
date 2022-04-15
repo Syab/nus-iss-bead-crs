@@ -1,11 +1,14 @@
 const axios = require('axios');
 const kafkaService = require('../services/kafkaService');
-const logger = require('../services/logger')
+const logger = require('../services/logger');
+const DateUtil = require('../services/dateutil');
 const {
     HDB_AVAIL_TOPIC_NAME,
     HDB_AVAIL_SCHEMA_ID,
     HDB_AVAILABILITY_API
 } = require("../services/config");
+
+const cvdate = new DateUtil();
 
 const formatToSchema = (schemaId, data) => ({
     value_schema_id : schemaId,
@@ -24,17 +27,21 @@ const getHDBCarparkAvailability = () => {
                 // console.log(res.data.items[0].timestamp)
                 const formattedData = res.data.items[0].carpark_data.map(
                     (item) => ({
-                        api_timestamp: res.data.items[0].timestamp.trim(),
+                        api_timestamp: cvdate.addXSeconds(res.data.items[0].timestamp.trim()).toString(),
                         total_lots: item.carpark_info[0].total_lots.trim(),
                         lot_type: item.carpark_info[0].lot_type.trim(),
                         lots_available: item.carpark_info[0].lots_available.trim(),
                         carpark_number: item.carpark_number.trim(),
-                        update_datetime: item.update_datetime.trim()
+                        update_datetime: cvdate.convertToSGT(item.update_datetime.trim()).toString()
                     })
                 )
                 // console.log(formattedData)
                 const formatToRestProxy = formatToSchema(HDB_AVAIL_SCHEMA_ID, formattedData)
+
                 console.log(formatToRestProxy)
+                // console.log(formatToRestProxy['records'][0]['value']['api_timestamp'])
+                logger.log("Pushing to Kafka")
+
                 kafkaService
                     .pushToTopic(HDB_AVAIL_TOPIC_NAME, formatToRestProxy)
                     .then((res) => {

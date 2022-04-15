@@ -4,8 +4,8 @@
   "description": "microservice to get hdb carpark information",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon --exec babel-node src/index.js",
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "nodemon --exec NODE_ENV=dev node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

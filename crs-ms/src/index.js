@@ -7,9 +7,11 @@ const { PORT, REST_PROXY_BASE_URI } = require('./services/config');
 const tasks = require("./tasks");
 const SVY21 = require('./services/svy21');
 const logger = require('./services/logger');
+const DateUtil = require('./services/dateutil')
 
 const app = express();
 const cv = new SVY21();
+const cvdate = new DateUtil();
 
 app.use(cors());
 app.use((req, res, next) => {
@@ -63,18 +65,19 @@ app.get('/convert', async (req, res) => {
     res.json(JSON.stringify(resultLatLon['lat'])+','+JSON.stringify(resultLatLon['lat']))
 })
 
-app.get('/test', async (req, res) => {
+app.get('/dateconvert', async (req, res) => {
     const response = await axios('https://api.data.gov.sg/v1/transport/carpark-availability',{
         method: "GET"
     })
-    logger.log(response.data.items[0].timestamp)
-    res.json('test')
+    const converted = await cvdate.addXSeconds(response.data.items[0].timestamp)
+    logger.log(response.data.items[0].timestamp, converted)
+    res.json('test date convert :' + response.data.items[0].timestamp + " to : " + converted)
 })
 
 
 app.listen(PORT, () =>{
-
     console.log(`Server Started on port : ${PORT}`)
+    console.log(process.env.NODE_ENV, "rest-proxy" , REST_PROXY_BASE_URI)
     }
 );
 
