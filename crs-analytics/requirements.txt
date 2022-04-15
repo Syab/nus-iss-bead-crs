@@ -1,0 +1,7 @@
+pandas~=1.4.2
+matplotlib~=3.5.1
+prophet~=1.0.1
+numpy~=1.22.3
+py4j~=0.10.9.3
+pyarrow~=7.0.0
+setuptools~=60.2.0

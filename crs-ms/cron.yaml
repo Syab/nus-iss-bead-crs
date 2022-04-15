@@ -3,7 +3,7 @@ cron:
     url: /hdbcpkavailability
     schedule: every 30 minutes synchronized
     timezone: Asia/Singapore
-  - description: "Every Week on Wednesday"
-    url: /hdbcpkinfo
-    schedule: every wednesday 15:45
-    timezone: Asia/Singapore
+#  - description: "Every Week on Wednesday"
+#    url: /hdbcpkinfo
+#    schedule: every wednesday 15:45
+#    timezone: Asia/Singapore
