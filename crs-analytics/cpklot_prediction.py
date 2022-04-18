@@ -24,6 +24,7 @@ result_schema = StructType([
     StructField('car_park_no', StringType()),
     StructField('latitude', StringType()),
     StructField('longitude', StringType()),
+    StructField('total_lots', StringType()),
     StructField('y', IntegerType()),
     StructField('yhat', IntegerType()),
     StructField('yhat_upper', IntegerType()),
