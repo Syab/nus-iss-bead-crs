@@ -4,10 +4,10 @@ cron:
     schedule: every 30 minutes synchronized
     timezone: Asia/Singapore
   - description: "Every 1 minute past midnight as GovTech has no records at 00:00"
-      url: /hdbcpkavailability
-      schedule: every 00:01
-      timezone: Asia/Singapore
+    url: /hdbcpkavailability
+    schedule: every day 00:01
+    timezone: Asia/Singapore
 #  - description: "Every Week on Wednesday"
 #    url: /hdbcpkinfo
-#    schedule: every wednesday 15:45
+#    schedule: every wednesday 22:45
 #    timezone: Asia/Singapore

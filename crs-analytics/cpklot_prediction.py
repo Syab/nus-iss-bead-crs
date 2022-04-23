@@ -3,7 +3,6 @@ from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from prophet import Prophet
 import os
-import io
 import boto3
 import pandas as pd
 from datetime import datetime
@@ -11,12 +10,14 @@ from datetime import datetime
 start_time = datetime.now()
 
 # get your credentials from environment variables
-AWS_ACCESS_KEY_ID = os.environ['AWS_ID']
-AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET']
+AWS_ACCESS_KEY_ID = "AKIAQWJCGZXHVN3NXJUY"
+AWS_SECRET_ACCESS_KEY = "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"
 AWS_REGION = "ap-southeast-1"
 AWS_S3_BUCKET = "ebd-demo"
 
-AWS_WRITE_OBJ_KEY = "testprediction/"
+AWS_WRITE_OBJ_KEY = "prediction/"
+# AWS_WRITE_OBJ_KEY = "testprediction/"
+local_path = "temp_results_location/"
 
 spark = SparkSession.builder.appName('sparks3dataprocML').master("local[*]").getOrCreate()
 result_schema = StructType([
@@ -41,7 +42,7 @@ def get_latest_file():
     my_bucket = s3.Bucket(AWS_S3_BUCKET)
     files = my_bucket.objects.filter(Prefix='input/')
     files = [obj.key for obj in sorted(files, key=lambda x: x.last_modified, reverse=True)][0:1]
-    print(files[0])
+    # print(files[0])
     return files[0]
 
 
@@ -78,6 +79,7 @@ status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
 if status == 200:
     print(f"Successful S3 get_object response. Status - {status}")
     df = pd.read_csv(response.get("Body"))
+    df.drop_duplicates(inplace=True)
     df['ds'] = pd.to_datetime(df['ds'])
     df['latitude'] = df['latitude'].astype(str)
     df['longitude'] = df['longitude'].astype(str)
@@ -85,43 +87,23 @@ if status == 200:
     # Convert to Spark dataframe
     sdf = spark.createDataFrame(df)
     sdf.printSchema()
-    sdf.show(10)
+    # sdf.show(10)
     sdf.count()
 
     # Repartition dataframe by carpark no
+    # noinspection PyTypeChecker
     carparkdf = sdf.repartition(spark.sparkContext.defaultParallelism, ['car_park_no']).cache()
-
-    # Apply time series forecasting
+    # carparkdf.show(10)
+    # # Apply time series forecasting
     results = (carparkdf.groupby('car_park_no').apply(forecast_result).withColumn('training_date', current_date()))
     results.cache()
-    results.show()
+    # results.show()
     results.write.option("header", "true").mode('overwrite').format('csv').save('./temp_results_location')
-
-    # Convert Back to Pandas and output to file
-    # print("converting to pandas again...")
-    # result_df = results.select("*").toPandas()
-    #
-    # response = s3_client.put_object(
-    #     Bucket=AWS_S3_BUCKET, Key=AWS_WRITE_OBJ_KEY)
-    #
-    # status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
-    # if status == 200:
-    #     print(f"Successful S3 put_object response. Status - {status}")
-    # else:
-    #     print(f"Unsuccessful S3 put_object response. Status - {status}")
-
-    # with io.StringIO() as csv_buffer:
-    #     print("Write to file and push to S3")
-    #     result_df.to_csv(csv_buffer, index=False)
-    #     response = s3_client.put_object(
-    #         Bucket=AWS_S3_BUCKET, Key=AWS_WRITE_OBJ_KEY, Body=csv_buffer.getvalue()
-    #     )
-    #
-    #     status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
-    #     if status == 200:
-    #         print(f"Successful S3 put_object response. Status - {status}")
-    #     else:
-    #         print(f"Unsuccessful S3 put_object response. Status - {status}")
+    file_list = [local_path + f for f in os.listdir(local_path) if f.endswith('c000.csv')]
+    for file in file_list:
+        # print(file)
+        filename = file.split("/")[-1]
+        response = s3_client.upload_file(file, AWS_S3_BUCKET, AWS_WRITE_OBJ_KEY + filename)
 
 else:
     print(f"Unsuccessful S3 get_object response. Status - {status}")

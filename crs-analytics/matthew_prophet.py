@@ -3,7 +3,6 @@ from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from prophet import Prophet
 import pandas as pd
-import matplotlib.pyplot as plt
 from datetime import datetime
 
 start_time = datetime.now()
@@ -14,6 +13,7 @@ result_schema = StructType([
     StructField('car_park_no', StringType()),
     StructField('latitude', StringType()),
     StructField('longitude', StringType()),
+    StructField('total_lots', StringType()),
     StructField('y', IntegerType()),
     StructField('yhat', IntegerType()),
     StructField('yhat_upper', IntegerType()),
@@ -31,30 +31,35 @@ def forecast_result(carpark_pd):
     num = forecast_pd._get_numeric_data()
     num[num < 0] = 0
     f_pd = forecast_pd[['ds', 'yhat', 'yhat_upper', 'yhat_lower']].set_index('ds')
-    cp_pd = carpark_pd[['ds', 'car_park_no', 'y', 'latitude', 'longitude']].set_index('ds')
+    cp_pd = carpark_pd[['ds', 'car_park_no', 'y', 'latitude', 'longitude', 'total_lots']].set_index('ds')
     result_pd = f_pd.join(cp_pd, how='left')
     result_pd.reset_index(level=0, inplace=True)
     result_pd['car_park_no'] = carpark_pd['car_park_no'].iloc[0]
     result_pd['latitude'] = carpark_pd['latitude'].iloc[0]
     result_pd['longitude'] = carpark_pd['longitude'].iloc[0]
-    return result_pd[['ds', 'car_park_no', 'latitude', 'longitude', 'y', 'yhat', 'yhat_upper', 'yhat_lower']]
+    return result_pd[
+        ['ds', 'car_park_no', 'latitude', 'longitude', 'total_lots', 'y', 'yhat', 'yhat_upper', 'yhat_lower']]
 
 
 # load data into panda dataframe and convert ds column to date time
-path = './carpark_data_all_location.csv'
+path = './carpark-all-location-20220420T16.csv'
+# path = 'gs://ebd-crs-analytics/carpark-all-location-20220421T09.csv'
+
 df = pd.read_csv(path)
+df.drop_duplicates(inplace=True)
 df['ds'] = pd.to_datetime(df['ds'])
 df['latitude'] = df['latitude'].astype(str)
 df['longitude'] = df['longitude'].astype(str)
+df['total_lots'] = df['total_lots'].astype(str)
 # Convert to Spark dataframe
 sdf = spark.createDataFrame(df)
 sdf.printSchema()
-sdf.show(5)
+sdf.show(10)
 sdf.count()
 # Repartition dataframe by carpark no
 carparkdf = sdf.repartition(spark.sparkContext.defaultParallelism, ['car_park_no']).cache()
-
-# Apply time series forecasting
+# carparkdf.show(10)
+# # Apply time series forecasting
 results = (carparkdf.groupby('car_park_no').apply(forecast_result).withColumn('training_date', current_date()))
 results.cache()
 results.show()
@@ -62,19 +67,7 @@ results.show()
 # Save results to csv
 results.write.option("header", "true").mode('overwrite').format('csv').save('./testdata_all_location')
 
-# Visualize Some data
-# results.coalesce(1)
-# print("total:", results.count(), "rows")
-# results.createOrReplaceTempView('forecasted')
-# spark.sql("SELECT car_park_no, count(*) FROM  forecasted GROUP BY car_park_no").show()
-# final_df = results.toPandas()
-#
-# # display the chart
-# final_df = final_df.set_index('ds')
-# final_df.query('car_park_no == "A100"')[['y', 'yhat']].plot()
-# plt.show()
-#
-# final_df.query('car_park_no == "A15"')[['y', 'yhat']].plot()
-# plt.show()
+# outpath = "gs://ebd-crs-analytics/temp_results"
+# results.write.option("header", "true").mode('overwrite').format('csv').save(outpath)
 
 print('Duration: {}'.format(datetime.now() - start_time))
