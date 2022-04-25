@@ -7,8 +7,6 @@ from datetime import datetime
 start_time = datetime.now()
 
 # get your credentials from environment variables
-# aws_id = os.environ['AWS_ID']
-# aws_secret = os.environ['AWS_SECRET']
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_KEY_ID']
 AWS_REGION = "ap-southeast-1"

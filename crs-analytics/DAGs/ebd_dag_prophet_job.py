@@ -17,23 +17,6 @@ PYSPARK_URI = 'gs://ebd-crs-analytics/testingprophet.py'
 
 path = "gs://goog-dataproc-initialization-actions-asia-east1/python/pip-install.sh"
 
-# CLUSTER_CONFIG = {
-#     "master_config": {
-#         "num_instances": 1,
-#         "machine_type_uri": "c2-standard-4",
-#         # "image-version": "2.0-rocky8",
-#         "disk_config": {"boot_disk_type": "pd-standard", "boot_disk_size_gb": 1024},
-#         "init_actions_uris": [path],
-#         "metadata": {'PIP_PACKAGES': 'pandas prophet numpy py4j pyarrow setuptools findspark boto3 google-cloud-storage'}
-#     },
-#     "worker_config": {
-#         "num_instances": 2,
-#         "machine_type_uri": "c2-standard-4",
-#         # "image-version": "2.0-rocky8",
-#         "disk_config": {"boot_disk_type": "pd-standard", "boot_disk_size_gb": 512}
-#     }
-# }
-
 CLUSTER_GENERATOR_CONFIG = ClusterGenerator(
     project_id="syab-node-projects",
     master_machine_type="c2-standard-4",
